@@ -27,7 +27,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Rota inicial - continua servindo Home.html
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'Login.html'));
+    res.sendFile(path.join(__dirname, 'public', 'Home.html'));
 });
 
 // =========================================================

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Programa Trilhas</title>
+    <link rel="stylesheet" href="./Styles/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="dashboard.js" defer></script> 
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="Assets/image1.png" alt="Logo" class="sidebar-logo">
+                <h2>Jovem Tech</h2>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li class="nav-item active"><a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li class="nav-item"><a href="#"><i class="fas fa-user"></i> Meu Perfil</a></li>
+                    <li class="nav-item"><a href="#"><i class="fas fa-book"></i> Minha Trilha</a></li>
+                    <li class="nav-item"><a href="#"><i class="fas fa-calendar-alt"></i> Eventos</a></li>
+                    <li class="nav-item"><a href="#"><i class="fas fa-comments"></i> Suporte</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="/" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Sair</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="main-header">
+                <h1>Bem-vindo ao seu Dashboard!</h1>
+                <div class="user-info">
+                    <span id="welcome-message">Olá, Usuário!</span>
+                    <img src="Assets/default-avatar.png" alt="Avatar" class="user-avatar">
+                </div>
+            </header>
+
+            <section class="overview-cards">
+                <div class="card">
+                    <i class="fas fa-chart-line card-icon"></i>
+                    <h3>Progresso da Trilha</h3>
+                    <p>Você completou <strong>30%</strong> da sua trilha de Front-end.</p>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: 30%;"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <i class="fas fa-graduation-cap card-icon"></i>
+                    <h3>Próximo Módulo</h3>
+                    <p><strong>Módulo 2:</strong> JavaScript Essencial</p>
+                    <p class="card-detail">Disponível em: 15/Julho</p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-tasks card-icon"></i>
+                    <h3>Tarefas Pendentes</h3>
+                    <p>Você tem <strong>2</strong> tarefas para hoje.</p>
+                    <p class="card-detail">Ver todas as tarefas</p>
+                </div>
+            </section>
+
+            <section class="recent-activity">
+                <h2>Atividades Recentes</h2>
+                <ul>
+                    <li><span class="activity-date">10/Jul</span> - Módulo 1 de Front-end concluído.</li>
+                    <li><span class="activity-date">08/Jul</span> - Nova aula de CSS avançado disponível.</li>
+                    <li><span class="activity-date">05/Jul</span> - Participou do webinar "Futuro do Desenvolvimento Web".</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

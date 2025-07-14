@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title> Login </title>
+        <link rel="stylesheet" href="./Styles/Home.css">
+        <script src="login.js" defer></script>
+    </head>
+<body class="HalfOne">
+    <div class="FirstHalf">
+        <p class="Voltar"> <img src="Assets/IconArrow.png" class="Arrow"> Voltar</p>
+        <h1 class="Subscription"> Login de Usuário </h1>
+        <p class="SubSubscription"> Preencha os dados abaixo para entrar em sua conta do Programa Trilhas </p>
+        <form id="loginForm">
+            <label for="username"> ID de usuário </label>
+            <input class ="Buttons" type="text" id="username" name="username" required>
+            <div class="error-message" data-field="username" style="display: none; color: var(--Semantic-Error); font-size: 0.875rem; margin-top: 4px;">Este campo é obrigatório</div>
+              
+            <label for="password"> Senha </label>
+            <input class ="Buttons" type="password" id="password" name="password" required>
+            <div class="error-message" data-field="password" style="display: none; color: var(--Semantic-Error); font-size: 0.875rem; margin-top: 4px;">Este campo é obrigatório</div>
+            
+            <div id="login-error-message" style="display: none; color: var(--Semantic-Error); font-size: 0.875rem; margin-top: 10px; text-align: center;"></div>
+
+            <nav class="Headers">
+                <div class="Cadastro">
+                    <p> Não tem conta? </p>
+                    <p><a href="Home.html"> <strong>Cadastre-se</strong> aqui </a></p>
+                </div>
+                <a class="Cancel" href="Home.html"> Cadastre-se </a> 
+                <button type="submit" class="Inscrição"> Entrar </button>
+            </nav>
+        </form>
+    </div>
+</body>
+
+<body class="HalfTwo" scroll="no" style="overflow: hidden"> 
+    <div class="SecondHalf">
+        <image src="Assets/image.png" alt="Pobre Sentado" class="PobreSentado">
+        <image src="Assets/image1.png" alt="Logo" class="Logo">
+    </div>
+</body>
+</html>

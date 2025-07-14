@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Formulário de Inscrição </title>
+    <link rel="stylesheet" href="./Styles/Home.css">
+    <script src="Home.js" defer></script>
+</head>
+<body class="HalfOne">
+    <div class="FirstHalf">
+        <p class="Voltar"> <img src="Assets/IconArrow.png" class="Arrow"> Voltar</p>
+        <h1 class="Subscription"> Formulário de Inscrição </h1>
+        <p class="SubSubscription"> Preencha os dados abaixo para fazer sua inscrição no Programa Trilhas. </p>
+        <h1 class="InfoIdiot"> Informações do Participante </h1>
+        <form id="registrationForm">
+            <label for="Nome"> Nome Completo </label>
+            <input class ="Buttons" type="text" id="Nome" name="nomeCompleto" required>
+            <div class="error-message" data-field="nomeCompleto" style="display: none; color: var(--Semantic-Error); font-size: 0.875rem; margin-top: 4px;">Este campo é obrigatório</div>
+
+            <label for="Nasc"> Data de Nascimento </label>
+            <input class ="Buttons" type="date" id="Nasc" name="dataNascimento" required>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const nascInput = document.getElementById('Nasc');
+                    if (nascInput) {
+                        const today = new Date();
+                        const fifteenYearsAgo = new Date(today.getFullYear() - 15, today.getMonth(), today.getDate());
+                        const formattedDate = fifteenYearsAgo.toISOString().split('T')[0];
+                        nascInput.setAttribute('max', formattedDate);
+                    }
+                });
+            </script>
+            <div class="error-message" data-field="dataNascimento" style="display: none; color: var(--Semantic-Error); font-size: 0.875rem; margin-top: 4px;">Este campo é obrigatório</div>
+
+            <label for="CPF"> CPF </label>
+            <input class ="Buttons" type="text" id="CPF" name="cpf" required>
+            <div class="error-message" data-field="cpf" style="display: none; color: var(--Semantic-Error); font-size: 0.875rem; margin-top: 4px;">Este campo é obrigatório</div>
+
+            <div class="custom-select" style="width:200px;">
+                <label for="Sexo"> Sexo </label>
+                <select class="Buttons" id="Sexo" name="sexo" required>
+                    <option value=""> Selecione </option>
+                    <option value="Feminino"> Feminino </option>
+                    <option value="Masculino"> Masculino </option>
+                    <option value="PND"> Prefiro não dizer </option>
+                </select>
+            </div>
+            <div class="error-message" data-field="sexo" style="display: none; color: var(--Semantic-Error); font-size: 0.875rem; margin-top: 4px;">Este campo é obrigatório</div>
+            
+            <label for="Email"> E-Mail </label>
+            <input class ="Buttons" type="email" id="Email" name="email" required>
+            <div class="error-message" data-field="email" style="display: none; color: var(--Semantic-Error); font-size: 0.875rem; margin-top: 4px;">Este campo é obrigatório</div>
+
+            <label for="Tel"> Telefone </label>
+            <input class ="Buttons" type="tel" id="Tel" name="telefone" maxlength="15" required>
+            <div class="error-message" data-field="telefone" style="display: none; color: var(--Semantic-Error); font-size: 0.875rem; margin-top: 4px;">Este campo é obrigatório</div>
+
+            <label for="Document"> Documento de Identidade </label>
+            <input type="file" id="Document" hidden name="documentoIdentidade">
+            <label for="Document" class="custom-file-label">
+                <img src="Assets/Archive.png" alt="Upload File" class="upload-icon" />
+            </label>
+            <div id="selectedFile" class="selected-file"></div>
+            <script>
+                document.getElementById("Document").addEventListener("change", function() {
+                    if (this.files.length > 0) {
+                        const fileName = this.files[0].name;
+                        document.getElementById("selectedFile").textContent = `Documento Selecionado: ${fileName}`;
+                    }
+                });
+            </script>
+            <div class="error-message" data-field="documentoIdentidade" style="display: none; color: var(--Semantic-Error); font-size: 0.875rem; margin-top: 4px;">Este campo é obrigatório</div>
+
+            <h1 class="InfoIdiot"> Endereço Residencial </h1>
+
+            <label for="CEP"> CEP </label>
+            <input class ="CEP" type="text" id="CEP" name="cep" maxlength="9" required>
+            <div class="error-message" data-field="cep" style="display: none; color: var(--Semantic-Error); font-size: 0.875rem; margin-top: 4px;">Este campo é obrigatório</div>
+            <p id="mensagem-erro" style="color: #DC2626; display: none; margin-top: -10px;"> CEP não encontrado </p>
+
+            <div class="RN">
+                <div class="Rua1">
+                    <label for="Rua"> Rua </label>
+                    <input class ="Rua" type="text" id="Rua" name="rua" required>
+                </div>
+                <div class="error-message" data-field="rua" style="display: none; color: var(--Semantic-Error); font-size: 0.875rem; margin-top: 4px;">Este campo é obrigatório</div>
+
+                <div class="Número1">
+                    <label for="Número"> Número </label>
+                    <input class ="Número" type="number" id="Número" name="numero" required>
+                </div>
+                <div class="error-message" data-field="numero" style="display: none; color: var(--Semantic-Error); font-size: 0.875rem; margin-top: 4px;">Este campo é obrigatório</div>
+            </div>
+
+            <div class="RN">
+                <div>
+                    <label for="Cidade"> Cidade </label>
+                    <input class ="Cidade" type="text" id="Cidade" name="cidade" required>
+                </div>
+                <div class="error-message" data-field="cidade" style="display: none; color: var(--Semantic-Error); font-size: 0.875rem; margin-top: 4px;">Este campo é obrigatório</div>
+
+                <div>
+                    <label for="Estado"> Estado </label>
+                    <input class ="Estado" type="text" id="Estado" name="estado" disabled required></input>
+                </div>
+                <div class="error-message" data-field="estado" style="display: none; color: var(--Semantic-Error); font-size: 0.875rem; margin-top: 4px;">Este campo é obrigatório</div>
+            </div>
+
+            <label for="Comprovante"> Comprovante de Residência </label>
+            <input type="file" id="Comprovante" hidden name="comprovanteResidencia">
+            <label for="Comprovante" class="custom-file-label">
+                <img src="Assets/Archive.png" alt="Upload File" class="upload-icon" />
+            </label>
+            <div id="comprovanteSelectedfile" class="selected-file"></div>
+            <script>
+                document.getElementById("Comprovante").addEventListener("change", function() {
+                    var displayElement = document.getElementById("comprovanteSelectedfile"); // Corrigido para 'comprovanteSelectedfile'
+                    if (displayElement && this.files.length > 0) {
+                        const fileName = this.files[0].name;
+                        displayElement.textContent = `Documento Selecionado: ${fileName}`;
+                    }
+                });
+            </script>
+            <script>
+                console.log("All elements with ID 'comprovanteSelectedfile':", document.querySelectorAll("#comprovanteSelectedfile"));
+                console.log("All elements with class 'selected-file':", document.querySelectorAll(".selected-file"));
+                console.log("Comprovante input element:", document.getElementById("Comprovante"));
+            </script>
+            <div class="error-message" data-field="comprovanteResidencia" style="display: none; color: var(--Semantic-Error); font-size: 0.875rem; margin-top: 4px;">Este campo é obrigatório</div>
+            
+            <h1 class="InfoIdiot"> Informações do usuário </h1>
+            <label for="Usuário"> ID de usuário </label>
+            <input class ="Buttons" type="text" id="Usuário" name="username" required>
+            <div class="error-message" data-field="username" style="display: none; color: var(--Semantic-Error); font-size: 0.875rem; margin-top: 4px;">Este campo é obrigatório</div>
+              
+            <label for="Senha"> Senha </label>
+            <input class ="Buttons" type="password" id="Senha" name="password" required>
+            <div class="error-message" data-field="password" style="display: none; color: var(--Semantic-Error); font-size: 0.875rem; margin-top: 4px;">Este campo é obrigatório</div>
+
+            <h1 class="Subscription"> Trilhas de aprendizagem </h1>
+            <p class="SubSubscription"> Selecione apenas uma trilha. </p>
+
+            <div class="grid-select-container">
+                <div class="grid-select-option" data-selected="false" data-value="Programação Front-end">
+                  <div class="select-indicator"></div>
+                  <div class="option-icon">  
+                    <img src="Assets/FrontEnd.png" alt="FrontEnd" width="24" height="24">
+                  </div>
+                  <div class="option-label">Programação Front-end</div>
+                </div>
+                <div class="grid-select-option" data-selected="false" data-value="Programação Back-end">
+                  <div class="select-indicator"></div>
+                  <div class="option-icon">
+                    <img src="Assets/BackEnd.png" alt="BackEnd" width="24" height="24">
+                  </div>
+                  <div class="option-label">Programação Back-end</div>
+                </div>
+                <div class="grid-select-option" data-selected="false" data-value="Programação de Jogos">
+                  <div class="select-indicator"></div>
+                  <div class="option-icon">
+                    <img src="Assets/Jogos.png" alt="Jogos" width="24" height="24">
+                  </div>
+                  <div class="option-label">Programação de Jogos</div>
+                </div>
+                <div class="grid-select-option" data-selected="false" data-value="Design e Experiência">
+                  <div class="select-indicator"></div>
+                  <div class="option-icon">
+                    <img src="Assets/UX.png" alt="UX" width="24" height="24">
+                  </div>
+                  <div class="option-label">Design e Experiência</div>
+                </div>
+                <div class="grid-select-option full-span" data-selected="false" data-value="Ciência de Dados">
+                  <div class="select-indicator"></div>
+                  <div class="option-icon">
+                    <img src="Assets/TI.png" alt="TI" width="24" height="24">
+                  </div>
+                  <div class="option-label">Ciência de Dados</div>
+                </div>
+            </div>
+            <script>
+                const options = document.querySelectorAll('.grid-select-option');
+                options.forEach(option => {
+                    option.addEventListener('click', function() {
+                      options.forEach(opt => opt.setAttribute('data-selected', 'false'));
+                      this.setAttribute('data-selected', 'true');
+                    });
+                });
+            </script>
+            <div class="error-message" data-field="trilhaAprendizagem" style="display: none; color: var(--Semantic-Error); font-size: 0.875rem; margin-top: 4px;">Este campo é obrigatório</div>
+                <div class="terms-container">
+                    <label class="terms-checkbox">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="termsCheckbox" name="termosAceitos" required/>
+                            <span class="checkmark"></span>
+                            <div class="terms-text"> Declaro que li e concordo com os <strong>Termos e Condições</strong> e com a <strong>Política de Privacidade. </strong></div>
+                        </div>
+                    </label>
+                </div>
+            <script>
+                const checkbox = document.getElementById('termsCheckbox');
+                
+                checkbox.addEventListener('change', function() {
+                  console.log('Terms accepted:', this.checked);
+                });
+            </script>
+                <div class="Headers">
+                    <button type="button" class="Cancel"> Cancelar </button> 
+                    <button type="submit" class="Inscrição"> Fazer Inscrição </button>
+                </div>
+        </form>
+    </div>
+</body>
+
+<body class="HalfTwo" scroll="no" style="overflow: hidden"> 
+    <div class="SecondHalf">
+        <image src="Assets/image.png" alt="Pobre Sentado" class="PobreSentado">
+        <image src="Assets/image1.png" alt="Logo" class="Logo">
+    </div>
+</body>
+</html>

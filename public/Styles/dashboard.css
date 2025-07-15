@@ -12,6 +12,10 @@
     --card-bg: #3a3f4e; /* Fundo dos cards */
     --card-shadow: rgba(0, 0, 0, 0.3);
     --hover-color: #5bb35e; /* Verde mais claro para hover */
+    --red-alert: #dc3545; /* Vermelho para alerta/sair */
+    --green-success: #28a745; /* Verde para sucesso */
+    --yellow-warning: #ffc107; /* Amarelo para aviso */
+    --blue-info: #007bff; /* Azul para informação */
 }
 
 body {
@@ -85,14 +89,22 @@ body {
     color: var(--primary-color);
 }
 
-.nav-item a:hover,
-.nav-item.active a {
+.nav-item a:hover {
     background-color: var(--dark-bg);
     color: var(--primary-color);
 }
+/* Estilo para o item de navegação ATIVO */
+.nav-item.active {
+    background-color: var(--dark-bg); /* Fundo escuro para o item ativo */
+    border-left: 5px solid var(--primary-color); /* Linha de destaque para o ativo */
+}
+
+.nav-item.active a {
+    color: var(--primary-color); /* Cor do texto do item ativo */
+}
 
 .nav-item.active a i {
-    color: var(--primary-color);
+    color: var(--primary-color); /* Cor do ícone do item ativo */
 }
 
 .sidebar-footer {
@@ -118,8 +130,8 @@ body {
 }
 
 .logout-btn:hover {
-    background-color: #dc3545; /* Vermelho para sair */
-    border-color: #dc3545;
+    background-color: var(--red-alert); /* Vermelho para sair */
+    border-color: var(--red-alert);
     color: white;
 }
 
@@ -274,24 +286,353 @@ body {
     border: 1px solid var(--border-color);
 }
 
-/* Responsividade básica */
+/* --- ESTILOS PARA INTERATIVIDADE DO DASHBOARD --- */
+
+/* Esconde as seções de conteúdo por padrão */
+.content-section {
+    display: none; /* Regra padrão para ocultar */
+    padding: 25px; /* Ajustei padding para combinar com outros cards */
+    background-color: var(--card-bg); /* Usando a cor de card existente */
+    border-radius: 12px; /* Arredondamento igual aos cards */
+    box-shadow: 0 4px 8px var(--card-shadow);
+    margin-bottom: 25px; /* Espaço entre as seções caso mais de uma esteja visível temporariamente */
+    border: 1px solid var(--border-color);
+    color: var(--text-color); /* Cor do texto para as novas seções */
+}
+
+/* A classe 'hidden' será adicionada/removida pelo JavaScript */
+.hidden {
+    display: none !important; /* !important garante que sobrescreve outras regras */
+}
+
+/* Estilos específicos para as novas seções de conteúdo */
+
+/* Estilos para o Card de Perfil */
+.profile-card {
+    display: flex;
+    flex-direction: column; /* Coluna para empilhar itens */
+    align-items: center;
+    gap: 20px;
+    padding: 30px;
+    background-color: var(--dark-bg); /* Fundo um pouco mais escuro para o card interno */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    max-width: 650px; /* Limite de largura para centralizar */
+    margin: 20px auto; /* Centraliza o card */
+    border: 1px solid var(--border-color);
+}
+
+.profile-avatar img {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--primary-color);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.btn-change-avatar {
+    background-color: #6c757d; /* Cinza */
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95em;
+    margin-top: 12px;
+    transition: background-color 0.3s ease;
+}
+.btn-change-avatar:hover {
+    background-color: #5a6268;
+}
+.btn-change-avatar i {
+    margin-right: 6px;
+}
+
+.profile-info {
+    text-align: center;
+    width: 100%;
+}
+
+.profile-info p {
+    margin-bottom: 10px;
+    font-size: 1.05em;
+    color: var(--text-color);
+}
+.profile-info strong {
+    color: var(--primary-color);
+}
+
+/* Botões genéricos para ações dentro das seções */
+.btn-edit-profile, 
+.btn-change-password, 
+.btn-view-certificate, 
+.btn-participate, 
+.btn-details, 
+.btn-contact, 
+.btn-submit-request {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+    margin: 10px 5px; /* Espaçamento entre botões */
+    transition: background-color 0.3s ease;
+    display: inline-flex; /* Para alinhar ícone e texto */
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-edit-profile:hover, .btn-change-password:hover, 
+.btn-view-certificate:hover, .btn-participate:hover, 
+.btn-details:hover, .btn-contact:hover, .btn-submit-request:hover {
+    background-color: var(--hover-color);
+}
+.btn-edit-profile i, .btn-change-password i, 
+.btn-view-certificate i, .btn-participate i, 
+.btn-details i, .btn-contact i, .btn-submit-request i {
+    margin-right: 8px;
+}
+
+/* Estilos para Minha Trilha */
+.trail-overview h3 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-size: 1.6rem;
+}
+
+.modules-list ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px;
+}
+
+.modules-list li {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 1.05em;
+    color: var(--text-color);
+}
+.modules-list li:last-child {
+    border-bottom: none;
+}
+
+.modules-list .completed {
+    color: var(--green-success); /* Verde para concluído */
+}
+.modules-list .in-progress {
+    color: var(--yellow-warning); /* Amarelo para em progresso */
+}
+.modules-list .upcoming {
+    color: var(--blue-info); /* Azul para futuro */
+}
+.modules-list i {
+    font-size: 1.2em;
+}
+
+/* Estilos para Eventos */
+.events-list ul {
+    list-style: none;
+    padding: 0;
+}
+.event-item {
+    background-color: var(--dark-bg); /* Fundo um pouco mais escuro para itens de evento */
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+.event-date {
+    font-weight: bold;
+    color: var(--primary-color);
+    flex-basis: 80px; /* Tamanho fixo para a data */
+    text-align: center;
+}
+.event-title {
+    flex-grow: 1; /* Ocupa espaço disponível */
+    font-size: 1.1em;
+    color: var(--text-color);
+}
+.event-time {
+    font-size: 0.9em;
+    color: #bbb;
+    margin-left: auto; /* Alinha à direita */
+}
+.btn-participate, .btn-details {
+    margin-left: 0; /* Reseta o margin-top padrão do botão genérico */
+    margin-top: 0;
+}
+
+
+/* Estilos para Suporte */
+.support-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+.contact-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 20px;
+}
+.contact-card {
+    background-color: var(--dark-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    width: 200px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease;
+}
+.contact-card:hover {
+    transform: translateY(-3px);
+}
+.contact-card .contact-icon {
+    font-size: 3em;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+.contact-card h4 {
+    margin-bottom: 5px;
+    color: var(--primary-color);
+}
+.contact-card p {
+    font-size: 0.9em;
+    color: #bbb;
+}
+.btn-contact {
+    margin-top: 15px;
+}
+
+.new-request-form {
+    background-color: var(--dark-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+.new-request-form h3 {
+    margin-bottom: 20px;
+    color: var(--primary-color);
+    font-size: 1.6rem;
+}
+.form-group {
+    margin-bottom: 18px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: var(--text-color);
+}
+.form-group input[type="text"],
+.form-group textarea {
+    width: calc(100% - 24px); /* Ajusta a largura com padding e borda */
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 1em;
+    background-color: var(--light-bg);
+    color: var(--text-color);
+}
+.form-group textarea {
+    resize: vertical; /* Permite redimensionar verticalmente */
+    min-height: 100px;
+}
+.btn-submit-request {
+    width: auto;
+    padding: 12px 30px;
+    margin-left: 0;
+    margin-right: 0;
+    display: inline-block;
+}
+
+
+/* Responsividade */
+@media (max-width: 992px) {
+    .overview-cards {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    .profile-card {
+        flex-direction: column;
+        padding: 25px;
+    }
+    .contact-options {
+        flex-direction: column;
+        align-items: center;
+    }
+    .contact-card {
+        width: 80%;
+    }
+}
+
 @media (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
     .sidebar {
-        width: 80px;
+        width: 100%;
+        height: auto;
+        flex-direction: row; /* Para itens de navegação horizontal */
+        flex-wrap: wrap; /* Permite quebrar linha */
+        justify-content: space-around; /* Distribui itens */
         padding: 15px 10px;
+        box-shadow: 0 2px 5px var(--card-shadow);
+        border-bottom: 1px solid var(--border-color);
+        border-right: none;
     }
-    .sidebar .logo h2, .sidebar .main-nav span {
-        display: none;
+    .sidebar .logo {
+        display: none; /* Esconde o logo em telas pequenas */
     }
-    .sidebar-logo {
-        width: 50px;
+    .main-nav {
+        width: 100%;
+        order: 1; /* Garante que a navegação apareça primeiro */
+    }
+    .main-nav ul {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .nav-item {
+        margin: 5px; /* Menos margem entre itens */
+    }
+    .nav-item a {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+    .nav-item a i {
+        margin-right: 5px;
+    }
+    .sidebar-footer {
+        display: none; /* Pode esconder o botão de sair em telas muito pequenas ou movê-lo para o header */
+    }
+    .main-content {
+        padding: 20px;
     }
     .main-header {
         flex-direction: column;
         align-items: flex-start;
+        margin-bottom: 30px;
+    }
+    .main-header h1 {
+        font-size: 1.8rem;
     }
     .user-info {
         margin-top: 15px;
+        width: 100%;
+        justify-content: flex-end;
     }
     .overview-cards {
         grid-template-columns: 1fr;
@@ -300,9 +641,16 @@ body {
 
 @media (max-width: 480px) {
     .main-content {
-        padding: 20px;
+        padding: 15px;
     }
     .main-header h1 {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
+    }
+    .event-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .event-time {
+        margin-left: 0;
     }
 }

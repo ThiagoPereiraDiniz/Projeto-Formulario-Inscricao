@@ -37,11 +37,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const mensagemErro = document.getElementById('mensagem-erro');
 
             try {
+                // Manter o fetch do ViaCEP aqui, pois é funcionalidade do frontend
+                // A URL está correta. Se houver erro, é problema de rede/ambiente.
                 const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                
+                // Verifica se a resposta HTTP do ViaCEP foi bem-sucedida (status 2xx)
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP! Status: ${response.status}`);
+                }
+
                 const data = await response.json();
 
-                if (data.erro) {
+                if (data.erro) { // Se o ViaCEP retornar um erro específico (CEP não encontrado)
                     mensagemErro.style.display = 'block';
+                    mensagemErro.textContent = 'CEP não encontrado.';
                     document.getElementById('Rua').value = '';
                     document.getElementById('Cidade').value = '';
                     document.getElementById('Estado').value = '';
@@ -52,9 +61,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('Estado').value = data.uf || '';
                 }
             } catch (error) {
-                console.error('Erro ao buscar CEP:', error);
-                mensagemErro.textContent = 'Erro ao buscar CEP. Tente novamente.';
+                console.error('Erro ao buscar CEP (rede ou API):', error);
+                mensagemErro.textContent = `Erro ao buscar CEP. Verifique sua conexão. (${error.message})`;
                 mensagemErro.style.display = 'block';
+                document.getElementById('Rua').value = ''; // Limpa os campos em caso de erro
+                document.getElementById('Cidade').value = '';
+                document.getElementById('Estado').value = '';
             }
         } else {
             document.getElementById('mensagem-erro').style.display = 'none';
@@ -70,25 +82,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Lógica de validação e envio do formulário ---
 
-    // Função para mostrar mensagem de erro
+    // Função para mostrar mensagem de erro e aplicar estilo
     const showError = (fieldId, message) => {
         const errorElement = document.querySelector(`.error-message[data-field="${fieldId}"]`);
         if (errorElement) {
             errorElement.textContent = message;
             errorElement.style.display = 'block';
+            // Adiciona a classe de erro ao input ou select
+            const inputElement = document.querySelector(`[name="${fieldId}"]`);
+            if (inputElement) {
+                inputElement.classList.add('error');
+            }
         }
     };
 
-    // Função para esconder mensagem de erro
+    // Função para esconder mensagem de erro e remover estilo
     const hideError = (fieldId) => {
         const errorElement = document.querySelector(`.error-message[data-field="${fieldId}"]`);
         if (errorElement) {
             errorElement.style.display = 'none';
+            // Remove a classe de erro do input ou select
+            const inputElement = document.querySelector(`[name="${fieldId}"]`);
+            if (inputElement) {
+                inputElement.classList.remove('error');
+            }
         }
     };
 
-    // Adicionar listeners para esconder erros ao digitar em inputs e selects
-    const inputs = registrationForm.querySelectorAll('input, select');
+    // Adicionar listeners para esconder erros ao digitar/selecionar em inputs e selects
+    const inputs = registrationForm.querySelectorAll('input:not([type="file"]), select');
     inputs.forEach(input => {
         const fieldName = input.name;
         if (fieldName) { // Só se o campo tiver um atributo 'name'
@@ -97,14 +119,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Adição de Listeners para máscaras (agora no JS, não no HTML) ---
+    // --- Adição de Listeners para máscaras ---
     document.getElementById('CPF').addEventListener('input', function() {
         mascara(this);
     });
     document.getElementById('Tel').addEventListener('keyup', handlePhone);
     document.getElementById('CEP').addEventListener('keyup', handleZipCode);
 
-    // --- Lógica do campo de data de nascimento (movido do HTML) ---
+    // --- Lógica do campo de data de nascimento ---
     const nascInput = document.getElementById('Nasc');
     if (nascInput) {
         const today = new Date();
@@ -113,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
         nascInput.setAttribute('max', formattedDate);
     }
 
-    // --- Lógica de upload de arquivos (movido do HTML) ---
+    // --- Lógica de upload de arquivos ---
     document.getElementById("Document").addEventListener("change", function() {
         if (this.files.length > 0) {
             const fileName = this.files[0].name;
@@ -134,21 +156,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Lógica da seleção das trilhas ---
     const trilhaOptions = document.querySelectorAll('.grid-select-option');
     trilhaOptions.forEach(option => {
-        option.addEventListener('click', function() { // Usar 'function' para ter 'this' correto
+        option.addEventListener('click', function() {
             trilhaOptions.forEach(opt => opt.setAttribute('data-selected', 'false'));
-            this.setAttribute('data-selected', 'true'); // 'this' refere-se à opção clicada
-            // Esconde o erro da trilha quando uma é selecionada
-            hideError('trilhaAprendizagem');
+            this.setAttribute('data-selected', 'true');
+            hideError('trilhaAprendizagem'); // Esconde o erro da trilha quando uma é selecionada
         });
     });
 
-    // --- Lógica do checkbox de termos (movido do HTML) ---
+    // --- Lógica do checkbox de termos ---
     const termsCheckbox = document.getElementById('termsCheckbox');
     if (termsCheckbox) {
         termsCheckbox.addEventListener('change', function() {
             console.log('Terms accepted:', this.checked);
-            // Poderia também esconder um erro específico aqui, se houver um para os termos
-            // hideError('termosAceitos'); // se você tiver um erro-message para ele
         });
     }
 
@@ -156,118 +175,119 @@ document.addEventListener('DOMContentLoaded', () => {
     registrationForm.addEventListener('submit', async (e) => {
         e.preventDefault(); // Impede o envio padrão do formulário (que recarregaria a página)
 
-        // Limpar mensagens de erro anteriores
+        // Limpar mensagens de erro anteriores e remover classes de erro dos inputs
         document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('input.error, select.error').forEach(el => el.classList.remove('error'));
 
-        const formData = {
-            nomeCompleto: document.getElementById('Nome').value,
-            dataNascimento: document.getElementById('Nasc').value, // Formato YYYY-MM-DD
-            cpf: document.getElementById('CPF').value.replace(/\D/g, ''), // Remover máscara para enviar
-            sexo: document.getElementById('Sexo').value,
-            email: document.getElementById('Email').value,
-            telefone: document.getElementById('Tel').value.replace(/\D/g, ''), // Remover máscara
-            // Os campos de upload de arquivo (documentoIdentidadePath, comprovanteResidenciaPath)
-            // não são incluídos diretamente no formData aqui porque não estamos lidando
-            // com upload de arquivos binários via JSON neste momento.
-            // Eles seriam nulos no backend, como discutido.
-            cep: document.getElementById('CEP').value.replace(/\D/g, ''), // Remover máscara
-            rua: document.getElementById('Rua').value,
-            numero: parseInt(document.getElementById('Número').value), // Converter para número
-            cidade: document.getElementById('Cidade').value,
-            estado: document.getElementById('Estado').value,
-            username: document.getElementById('Usuário').value,
-            password: document.getElementById('Senha').value, // A senha será hashed no backend
-            termosAceitos: document.getElementById('termsCheckbox').checked
+
+        let isValid = true; // Flag para verificar a validade do formulário
+
+        // 1. Coleta e validação dos dados de texto/select
+        const rawData = {
+            nomeCompleto: document.getElementById('Nome').value.trim(),
+            dataNascimento: document.getElementById('Nasc').value.trim(),
+            cpf: document.getElementById('CPF').value.replace(/\D/g, '').trim(),
+            sexo: document.getElementById('Sexo').value.trim(),
+            email: document.getElementById('Email').value.trim(),
+            telefone: document.getElementById('Tel').value.replace(/\D/g, '').trim(),
+            cep: document.getElementById('CEP').value.replace(/\D/g, '').trim(),
+            rua: document.getElementById('Rua').value.trim(),
+            numero: document.getElementById('Número').value.trim(),
+            cidade: document.getElementById('Cidade').value.trim(),
+            estado: document.getElementById('Estado').value.trim(),
+            username: document.getElementById('Usuário').value.trim(),
+            password: document.getElementById('Senha').value.trim(),
+            // Trilha e termos serão tratados separadamente para validação específica
         };
 
-        // Obter a trilha de aprendizagem selecionada
-        const selectedTrilhaElement = document.querySelector('.grid-select-option[data-selected="true"]');
-        if (selectedTrilhaElement) {
-            formData.trilhaAprendizagem = selectedTrilhaElement.dataset.value;
-        } else {
-            formData.trilhaAprendizagem = ''; // Caso nenhuma trilha seja selecionada
+        // Validação de campos obrigatórios simples
+        for (const [key, value] of Object.entries(rawData)) {
+            if (value === '') { // Usar === '' após o .trim() para campos de texto
+                showError(key, `O campo é obrigatório.`);
+                isValid = false;
+            }
         }
 
-        // --- Validação básica no frontend ---
-        let isValid = true;
-
-        if (!formData.nomeCompleto) { showError('nomeCompleto', 'Por favor, insira seu nome completo.'); isValid = false; }
-        if (!formData.dataNascimento) { showError('dataNascimento', 'Por favor, insira sua data de nascimento.'); isValid = false; }
-        if (!formData.cpf) { showError('cpf', 'Por favor, insira seu CPF.'); isValid = false; }
-        if (formData.cpf.length !== 11) { showError('cpf', 'CPF deve ter 11 dígitos.'); isValid = false; }
-        if (!formData.sexo) { showError('sexo', 'Por favor, selecione seu sexo.'); isValid = false; }
-        if (!formData.email) { showError('email', 'Por favor, insira seu e-mail.'); isValid = false; }
-        // Validação de email mais robusta pode ser adicionada aqui
-        if (!formData.telefone) { showError('telefone', 'Por favor, insira seu telefone.'); isValid = false; }
-        if (!formData.cep) { showError('cep', 'Por favor, insira seu CEP.'); isValid = false; }
-        if (!formData.rua) { showError('rua', 'Por favor, insira sua rua.'); isValid = false; }
-        if (!formData.numero || isNaN(formData.numero)) { showError('numero', 'Por favor, insira um número válido.'); isValid = false; }
-        if (!formData.cidade) { showError('cidade', 'Por favor, insira sua cidade.'); isValid = false; }
-        if (!formData.estado) { showError('estado', 'Por favor, insira seu estado.'); isValid = false; }
-        if (!formData.username) { showError('username', 'Por favor, insira um ID de usuário.'); isValid = false; }
-        if (!formData.password) { showError('password', 'Por favor, insira uma senha.'); isValid = false; }
-        if (!formData.trilhaAprendizagem) { showError('trilhaAprendizagem', 'Por favor, selecione uma trilha de aprendizagem.'); isValid = false; }
-        if (!formData.termosAceitos) {
-            alert('Você deve aceitar os Termos e Condições para se inscrever.');
+        // Validação específica para o campo de upload de identidade
+        const documentFile = document.getElementById('Document').files[0];
+        if (!documentFile) {
+            showError('documentoIdentidade', 'O documento de identidade é obrigatório.');
             isValid = false;
         }
 
-        // Para os campos de upload de arquivo:
-        // No momento, seu backend não espera esses campos via JSON.
-        // Se você quiser que sejam obrigatórios no frontend, você precisará
-        // verificar se this.files[0] existe para 'Document' e 'Comprovante'
-        // e adicionar um showError para eles.
-        // Exemplo:
-        // if (!document.getElementById('Document').files[0]) {
-        //     showError('documentoIdentidade', 'Por favor, anexe o documento de identidade.');
-        //     isValid = false;
-        // }
-        // if (!document.getElementById('Comprovante').files[0]) {
-        //     showError('comprovanteResidencia', 'Por favor, anexe o comprovante de residência.');
-        //     isValid = false;
-        // }
+        // Validação específica para o campo de upload de comprovante de residência
+        const comprovanteFile = document.getElementById('Comprovante').files[0];
+        if (!comprovanteFile) {
+            showError('comprovanteResidencia', 'O comprovante de residência é obrigatório.');
+            isValid = false;
+        }
+
+        // Validação da trilha de aprendizagem
+        const selectedTrilhaOption = document.querySelector('.grid-select-option[data-selected="true"]');
+        let trilhaAprendizagemValue = null;
+        if (selectedTrilhaOption) {
+            trilhaAprendizagemValue = selectedTrilhaOption.dataset.value;
+        } else {
+            showError('trilhaAprendizagem', 'Selecione uma trilha de aprendizagem.');
+            isValid = false;
+        }
+        
+        // Validação dos termos e condições
+        if (!termsCheckbox.checked) {
+            alert('Você deve concordar com os Termos e Condições e com a Política de Privacidade para fazer a inscrição.');
+            isValid = false;
+        }
 
         if (!isValid) {
-            // Se a validação do frontend falhou, pare aqui
-            return;
+            console.log('Formulário inválido. Corrija os erros.');
+            return; // Impede o envio se houver erros de validação
+        }
+
+        // Se o formulário for válido, prosseguir com o envio
+        console.log('Formulário válido. Enviando dados...');
+        
+        // Criar FormData para enviar dados e arquivos
+        const formToSend = new FormData();
+        for (const key in rawData) {
+            formToSend.append(key, rawData[key]);
+        }
+        formToSend.append('trilhaAprendizagem', trilhaAprendizagemValue);
+        formToSend.append('termosAceitos', termsCheckbox.checked);
+
+        // Adicionar arquivos ao FormData
+        if (documentFile) {
+            formToSend.append('documentoIdentidadeFile', documentFile); // Nome do campo esperado pelo seu backend
+        }
+        if (comprovanteFile) {
+            formToSend.append('comprovanteResidenciaFile', comprovanteFile); // Nome do campo esperado pelo seu backend
         }
 
         try {
-            // Enviar dados para o backend
-            const response = await fetch('/register', { // A rota que criamos no server.js
+            // A URL DEVE SER APENAS '/register' ou 'http://localhost:3000/register'
+            // O '/1' no erro 500 que você viu indica que algo adicionou isso.
+            // Certifique-se que NENHUMA extensão do navegador está modificando suas requisições.
+            const response = await fetch('http://localhost:3000/register', { 
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json' // Indicamos que estamos enviando JSON
-                },
-                body: JSON.stringify(formData) // Converte o objeto JavaScript para uma string JSON
+                body: formToSend, // FormData não precisa de 'Content-Type' customizado para 'multipart/form-data'
             });
 
-            const data = await response.json(); // Tenta parsear a resposta como JSON
-
-            if (response.ok) { // Status HTTP 2xx (ex: 200 OK, 201 Created)
-                alert('Inscrição realizada com sucesso! Redirecionando para a página de login.');
-                window.location.href = 'login.html'; // Redireciona para a página de login
+            if (response.ok) {
+                const result = await response.json(); 
+                console.log('Inscrição realizada com sucesso!', result);
+                alert('Inscrição realizada com sucesso!');
+                registrationForm.reset(); 
+                document.getElementById("selectedFile").textContent = ''; 
+                document.getElementById("comprovanteSelectedfile").textContent = ''; 
+                trilhaOptions.forEach(opt => opt.setAttribute('data-selected', 'false')); 
             } else {
-                // Se o backend retornou um erro (ex: 400 Bad Request, 409 Conflict)
-                alert('Erro na inscrição: ' + (data.message || 'Ocorreu um erro desconhecido.'));
-                // Você pode adicionar lógica para exibir erros específicos do backend
-                // Por exemplo, se data.errors tiver informações sobre campos específicos
+                // Capturar o erro do backend mais detalhadamente
+                const errorData = await response.json().catch(() => ({ message: 'Resposta não é JSON ou erro desconhecido.' }));
+                console.error('Erro na inscrição:', response.status, errorData);
+                alert(`Erro ao fazer inscrição (${response.status}): ${errorData.message || 'Verifique os dados e tente novamente.'}`);
             }
         } catch (error) {
-            console.error('Erro ao enviar formulário:', error);
-            alert('Erro de conexão com o servidor. Tente novamente mais tarde.');
+            console.error('Erro de rede ou no servidor:', error);
+            alert('Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.');
         }
     });
-
-    // Código para a funcionalidade do botão Voltar (se quiser que ele volte)
-    const backButton = document.querySelector('.Voltar');
-    if (backButton) {
-        backButton.addEventListener('click', () => {
-            // window.history.back(); // Volta para a página anterior
-            // Ou redireciona para uma página específica, se for o caso
-            // window.location.href = 'index.html';
-            alert('Funcionalidade Voltar ainda não implementada para este exemplo.');
-        });
-    }
-
-}); // Fim do DOMContentLoaded
+});

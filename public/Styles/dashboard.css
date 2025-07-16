@@ -43,6 +43,13 @@ body {
     justify-content: space-between;
     box-shadow: 2px 0 5px var(--card-shadow);
     border-right: 1px solid var(--border-color);
+
+    /* >>> ESSAS PROPRIEDADES DEVEM ESTAR AQUI (fora da media query) <<< */
+    height: 100vh; /* Faz a sidebar ocupar 100% da altura da viewport */
+    position: sticky; /* Mantém a sidebar "fixa" na tela enquanto o resto rola */
+    top: 0; /* Anexa ao topo da viewport */
+    overflow-y: auto; /* Adiciona rolagem vertical se o conteúdo exceder a altura */
+    flex-shrink: 0; /* Impede que a sidebar encolha */
 }
 
 .logo {
@@ -288,21 +295,19 @@ body {
 
 /* --- ESTILOS PARA INTERATIVIDADE DO DASHBOARD --- */
 
-/* Esconde as seções de conteúdo por padrão */
 .content-section {
-    display: none; /* Regra padrão para ocultar */
-    padding: 25px; /* Ajustei padding para combinar com outros cards */
-    background-color: var(--card-bg); /* Usando a cor de card existente */
-    border-radius: 12px; /* Arredondamento igual aos cards */
+    padding: 30px; /* Aumentei o padding geral para todas as seções */
+    background-color: var(--card-bg); 
+    border-radius: 12px; 
     box-shadow: 0 4px 8px var(--card-shadow);
-    margin-bottom: 25px; /* Espaço entre as seções caso mais de uma esteja visível temporariamente */
+    margin-bottom: 25px; 
     border: 1px solid var(--border-color);
-    color: var(--text-color); /* Cor do texto para as novas seções */
+    color: var(--text-color); 
 }
 
 /* A classe 'hidden' será adicionada/removida pelo JavaScript */
 .hidden {
-    display: none !important; /* !important garante que sobrescreve outras regras */
+    display: none !important; 
 }
 
 /* Estilos específicos para as novas seções de conteúdo */
@@ -402,6 +407,55 @@ body {
     margin-bottom: 15px;
     font-size: 1.6rem;
 }
+
+/* Estilos para o contêiner do vídeo na seção 'Minha Trilha' */
+.video-container {
+    background-color: var(--dark-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 25px; /* Aumentei um pouco o padding para dar mais 'ar' interno */
+    margin-bottom: 30px; /* Aumentei um pouco a margem inferior para separar mais dos módulos */
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    max-width: 800px; /* Mantém a largura máxima */
+    margin-left: auto; /* Garante que o contêiner seja centralizado */
+    margin-right: auto; /* Garante que o contêiner seja centralizado */
+}
+
+.video-container h4 {
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 20px; /* Aumentei a margem inferior para separar do vídeo */
+    font-size: 1.5rem; /* Levemente maior */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-container h4 i {
+    margin-right: 12px; /* Aumentei a margem do ícone */
+    font-size: 1.8rem; /* Ícone um pouco maior */
+}
+
+.intro-video {
+    width: 100%;
+    max-width: 750px; /* Pode ajustar este valor se 800px for muito largo */
+    height: auto;
+    border-radius: 8px;
+    background-color: black;
+    display: block;
+    margin: 0 auto 20px auto; /* Aumentei a margem inferior para separar da descrição */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4); /* Sombra mais pronunciada para dar profundidade */
+}
+
+.video-description {
+    font-size: 1em; /* Levemente maior */
+    color: #c0c0c0; /* Cor um pouco mais clara para a descrição */
+    line-height: 1.6; /* Mais espaçamento entre linhas */
+    max-width: 700px; /* Limita a largura para leitura mais confortável */
+    margin: 0 auto; /* Centraliza a descrição */
+}
+
 
 .modules-list ul {
     list-style: none;
@@ -578,16 +632,21 @@ body {
     }
 }
 
+/* >>> MODIFICAÇÃO DA MEDIA QUERY PARA 768PX <<< */
 @media (max-width: 768px) {
     .dashboard-container {
-        flex-direction: column;
+        flex-direction: column; /* Continua empilhando main-content e sidebar */
     }
+    /* Sidebar */
     .sidebar {
-        width: 100%;
-        height: auto;
-        flex-direction: row; /* Para itens de navegação horizontal */
-        flex-wrap: wrap; /* Permite quebrar linha */
-        justify-content: space-around; /* Distribui itens */
+        width: 100%; /* Ocupa toda a largura da tela */
+        height: auto; /* Altura flexível */
+        position: relative; /* Remove sticky em telas pequenas para evitar conflitos */
+        top: auto; /* Remove top:0 */
+        overflow-y: visible; /* Remove rolagem interna se não for necessário */
+        flex-direction: row; /* Itens de navegação em linha (horizontal) */
+        flex-wrap: wrap; /* Permite quebrar linha se não couberem */
+        justify-content: space-around; /* Distribui itens horizontalmente */
         padding: 15px 10px;
         box-shadow: 0 2px 5px var(--card-shadow);
         border-bottom: 1px solid var(--border-color);
@@ -611,9 +670,12 @@ body {
     .nav-item a {
         padding: 8px 12px;
         font-size: 0.9rem;
+        flex-direction: column; /* Ícone em cima do texto em itens da nav */
+        text-align: center;
     }
     .nav-item a i {
-        margin-right: 5px;
+        margin-right: 0; /* Remove margem direita do ícone */
+        margin-bottom: 5px; /* Adiciona margem abaixo do ícone */
     }
     .sidebar-footer {
         display: none; /* Pode esconder o botão de sair em telas muito pequenas ou movê-lo para o header */

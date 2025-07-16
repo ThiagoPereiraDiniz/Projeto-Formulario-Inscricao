@@ -4,8 +4,11 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const bcrypt = require('bcryptjs'); // Importar bcryptjs
-const User = require('./models/User'); // Importar o modelo de usuário
+const bcrypt = require('bcryptjs');
+const User = require('./models/User'); // Certifique-se de que este caminho está correto
+const multer = require('multer');       // Importar multer
+const fs = require('fs');               // Importar fs para criar diretórios
+const cors = require('cors');           // Importar cors
 
 // Carregar variáveis de ambiente do arquivo .env
 dotenv.config();
@@ -13,29 +16,74 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware para parsear o corpo das requisições JSON
-// Isso é essencial para que você consiga acessar os dados do formulário via req.body
-app.use(express.json());
+// =========================================================
+// MIDDLEWARES GLOBAIS
+// =========================================================
 
-// Conectar ao MongoDB
+// 1. CORS: Permite que seu frontend (em outra porta ou domínio) se conecte ao backend
+app.use(cors());
+
+// 2. Body Parsers para JSON e URL-encoded data
+// Estes são para dados que NÃO SÃO multipart/form-data
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// =========================================================
+// CONFIGURAÇÃO DO MULTER PARA UPLOAD DE ARQUIVOS
+// =========================================================
+
+// Define onde os arquivos serão armazenados e com que nome
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const uploadPath = path.join(__dirname, 'uploads'); // Diretório onde os arquivos serão salvos
+        // Cria o diretório 'uploads' se ele não existir
+        if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath, { recursive: true });
+        }
+        cb(null, uploadPath);
+    },
+    filename: (req, file, cb) => {
+        // Define o nome do arquivo, ex: 'documentoIdentidade-1707202512345.pdf'
+        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    }
+});
+
+// Cria a instância do multer com a configuração de armazenamento
+const upload = multer({ storage: storage });
+
+// =========================================================
+// CONEXÃO COM O BANCO DE DADOS
+// =========================================================
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('Conectado ao MongoDB Atlas!'))
     .catch(err => console.error('Erro ao conectar ao MongoDB:', err));
 
-// Servir arquivos estáticos (seu frontend)
-app.use(express.static(path.join(__dirname, 'public')));
+// =========================================================
+// SERVIÇO DE ARQUIVOS ESTÁTICOS
+// =========================================================
 
-// Rota inicial - continua servindo Home.html
+// Servir arquivos estáticos do frontend (Home.html, Home.js, etc.)
+app.use(express.static(path.join(__dirname, 'public')));
+// Servir os arquivos carregados pelo Multer (para o frontend poder acessá-los, se necessário)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// =========================================================
+// ROTAS DA API E DE SERVIÇO DE PÁGINAS
+// =========================================================
+
+// Rota inicial - serve Home.html
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+    res.sendFile(path.join(__dirname, 'public', 'Home.html'));
 });
 
-// =========================================================
 // ROTA DE REGISTRO DE USUÁRIO (POST /register)
-// =========================================================
-app.post('/register', async (req, res) => {
+// Usa o middleware 'upload.fields' para processar arquivos e campos de texto
+app.post('/register', upload.fields([
+    { name: 'documentoIdentidadeFile', maxCount: 1 },    // Nome do campo no FormData do frontend
+    { name: 'comprovanteResidenciaFile', maxCount: 1 } // Nome do campo no FormData do frontend
+]), async (req, res) => {
     try {
-        // 1. Obter os dados do corpo da requisição
+        // req.body agora conterá os campos de texto do formulário
         const {
             nomeCompleto,
             dataNascimento,
@@ -44,21 +92,55 @@ app.post('/register', async (req, res) => {
             email,
             telefone,
             cep,
-            // documentoIdentidadePath, // Não estamos lidando com upload de arquivos diretamente via JSON para esses campos por enquanto.
-            // comprovanteResidenciaPath,
             rua,
             numero,
             cidade,
             estado,
             username,
-            password, // Senha em texto puro, que será criptografada
+            password,
             trilhaAprendizagem,
-            termosAceitos
+            termosAceitos // Virá como string 'true' ou 'false' do FormData
         } = req.body;
 
-        // Validação básica do backend
-        if (!nomeCompleto || !email || !username || !password || !termosAceitos || !trilhaAprendizagem || !cpf || !dataNascimento || !sexo || !telefone || !cep || !rua || !numero || !cidade || !estado) {
-            return res.status(400).json({ message: 'Todos os campos obrigatórios devem ser preenchidos.' });
+        // req.files conterá os arquivos carregados
+        const documentoIdentidadeFile = req.files['documentoIdentidadeFile'] ? req.files['documentoIdentidadeFile'][0] : null;
+        const comprovanteResidenciaFile = req.files['comprovanteResidenciaFile'] ? req.files['comprovanteResidenciaFile'][0] : null;
+
+        // Validação mais rigorosa para todos os campos obrigatórios
+        const requiredFields = [
+            nomeCompleto, dataNascimento, cpf, sexo, email, telefone,
+            cep, rua, numero, cidade, estado, username, password,
+            trilhaAprendizagem
+        ];
+
+        // Verifica se algum campo de texto/select está vazio ou undefined
+        const isAnyFieldMissing = requiredFields.some(field => {
+            // Para strings, verifica se é vazia ou apenas espaços em branco
+            if (typeof field === 'string') return field.trim() === '';
+            // Para outros tipos (como booleans se termosAceitos fosse tratado aqui diretamente), apenas verifica se é null/undefined
+            return field === undefined || field === null;
+        });
+
+        if (isAnyFieldMissing) {
+            console.log("Campos de texto/select faltando:", {
+                nomeCompleto, dataNascimento, cpf, sexo, email, telefone,
+                cep, rua, numero, cidade, estado, username, password,
+                trilhaAprendizagem
+            });
+            return res.status(400).json({ message: 'Todos os campos de texto e seleção são obrigatórios.' });
+        }
+
+        // Validação específica para arquivos
+        if (!documentoIdentidadeFile) {
+            return res.status(400).json({ message: 'O documento de identidade é obrigatório.' });
+        }
+        if (!comprovanteResidenciaFile) {
+            return res.status(400).json({ message: 'O comprovante de residência é obrigatório.' });
+        }
+
+        // Validação dos termos aceitos (converte de string para booleano)
+        if (termosAceitos !== 'true') {
+            return res.status(400).json({ message: 'Você deve aceitar os termos e condições.' });
         }
 
         // 2. Verificar se o usuário (username ou email/cpf) já existe
@@ -68,18 +150,11 @@ app.post('/register', async (req, res) => {
             if (existingUser.username === username) message = 'Nome de usuário já está em uso.';
             else if (existingUser.email === email) message = 'Email já está em uso.';
             else if (existingUser.cpf === cpf) message = 'CPF já está em uso.';
-            return res.status(409).json({ message: message }); // 409 Conflict
+            return res.status(409).json({ message: message }); // 409 Conflict (Conflito)
         }
 
-        // Se você estivesse usando o middleware 'pre save' no modelo User.js para hash da senha
-        // você não precisaria destas duas linhas aqui.
-        // Já verificamos que seu User.js tem o pre save, então essa parte abaixo não seria estritamente necessária aqui,
-        // mas não há problema em tê-la se quiser garantir o hash aqui também (redundância).
-        // No entanto, para evitar hashing duplo ou inconsistência, o ideal é confiar no middleware.
-        // Removi o hash aqui para confiar no modelo.
-
         // 3. Criar uma nova instância do usuário com os dados
-        // A senha será hashed automaticamente pelo middleware 'pre('save')' no models/User.js
+        // Incluir os caminhos dos arquivos salvos pelo Multer
         const newUser = new User({
             nomeCompleto,
             dataNascimento,
@@ -93,32 +168,31 @@ app.post('/register', async (req, res) => {
             cidade,
             estado,
             username,
-            password, // A senha será hashed pelo middleware no User.js antes de ser salva
+            password, // A senha será hashed pelo middleware 'pre('save')' no models/User.js
             trilhaAprendizagem,
-            termosAceitos
+            termosAceitos: termosAceitos === 'true', // Converte a string 'true'/'false' para booleano
+            documentoIdentidadePath: documentoIdentidadeFile ? `/uploads/${documentoIdentidadeFile.filename}` : null,
+            comprovanteResidenciaPath: comprovanteResidenciaFile ? `/uploads/${comprovanteResidenciaFile.filename}` : null
         });
 
         // 4. Salvar o novo usuário no banco de dados
         await newUser.save();
 
         // 5. Enviar uma resposta de sucesso para o frontend
-        res.status(201).json({ message: 'Usuário registrado com sucesso!' }); // 201 Created
+        res.status(201).json({ message: 'Usuário registrado com sucesso!' }); // 201 Created (Criado)
 
     } catch (error) {
         console.error('Erro no registro de usuário:', error);
-        // Verificar se é um erro de validação do Mongoose (ex: campo 'required' faltando)
+        // Verificar se é um erro de validação do Mongoose (ex: campo 'required' faltando ou tipo incorreto)
         if (error.name === 'ValidationError') {
             const messages = Object.values(error.errors).map(val => val.message);
-            return res.status(400).json({ message: messages.join(', ') });
+            return res.status(400).json({ message: `Erro de validação: ${messages.join(', ')}` });
         }
         res.status(500).json({ message: 'Erro interno do servidor ao registrar usuário.' });
     }
 });
 
-// =========================================================
-// NOVA ROTA: Rota de Login de Usuário (POST /login)
-// ADICIONE ESTE BLOCO LOGO ABAIXO DA ROTA /register
-// =========================================================
+// Rota de Login de Usuário (POST /login)
 app.post('/login', async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -128,12 +202,12 @@ app.post('/login', async (req, res) => {
 
         // 2. Verificar se o usuário existe
         if (!user) {
-            // Não dê detalhes sobre se o usuário não existe ou a senha está errada para segurança
+            // Para segurança, não dê detalhes sobre se o usuário não existe ou a senha está errada
             return res.status(401).json({ message: 'Usuário ou senha inválidos.' });
         }
 
         // 3. Comparar a senha fornecida com a senha hash armazenada
-        // O método matchPassword é definido no seu models/User.js
+        // O método matchPassword é definido no seu models/User.js (espera-se que sim)
         const isMatch = await user.matchPassword(password);
 
         // 4. Verificar se as senhas coincidem
@@ -146,7 +220,7 @@ app.post('/login', async (req, res) => {
             message: 'Login bem-sucedido!',
             username: user.username,
             email: user.email // Você pode retornar alguns dados do usuário (exceto a senha)
-            // Aqui, em um sistema real, você geraria e enviaria um token JWT
+            // Em um sistema real, aqui você geraria e enviaria um token JWT para o cliente
         });
 
     } catch (error) {
@@ -154,23 +228,20 @@ app.post('/login', async (req, res) => {
         res.status(500).json({ message: 'Erro interno do servidor ao fazer login.' });
     }
 });
-// =========================================================
-// FIM DA NOVA ROTA DE LOGIN
-// =========================================================
 
-
-// Rota para servir a página de login.html (opcional, se você quiser acessá-la diretamente)
+// Rotas para servir outras páginas HTML
 app.get('/login.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'Login.html'));
 });
 
-// Rota para uma página pós-login (exemplo)
 app.get('/dashboard.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'dashboard.html')); // Você precisará criar este arquivo
+    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
 
-// Iniciar o servidor
+// =========================================================
+// INICIAR O SERVIDOR
+// =========================================================
 app.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
 });

@@ -278,7 +278,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 registrationForm.reset(); 
                 document.getElementById("selectedFile").textContent = ''; 
                 document.getElementById("comprovanteSelectedfile").textContent = ''; 
-                trilhaOptions.forEach(opt => opt.setAttribute('data-selected', 'false')); 
+                trilhaOptions.forEach(opt => opt.setAttribute('data-selected', 'false'));
+                window.location.href = '/login.html';
             } else {
                 // Capturar o erro do backend mais detalhadamente
                 const errorData = await response.json().catch(() => ({ message: 'Resposta não é JSON ou erro desconhecido.' }));

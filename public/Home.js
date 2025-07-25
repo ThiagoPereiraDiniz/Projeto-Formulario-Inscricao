@@ -273,15 +273,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 const result = await response.json();
                 console.log('Inscrição realizada com sucesso!', result);
                 alert('Inscrição realizada com sucesso!');
-                // **********************************************
-                // *** ADIÇÃO DA LINHA DE REDIRECIONAMENTO AQUI ***
-                // **********************************************
                 window.location.href = '/login.html'; // Redireciona para a página de login
 
                 registrationForm.reset();
                 document.getElementById("selectedFile").textContent = '';
                 document.getElementById("comprovanteSelectedfile").textContent = '';
                 trilhaOptions.forEach(opt => opt.setAttribute('data-selected', 'false'));
+
+                registrationForm.reset(); 
+                document.getElementById("selectedFile").textContent = ''; 
+                document.getElementById("comprovanteSelectedfile").textContent = ''; 
+                trilhaOptions.forEach(opt => opt.setAttribute('data-selected', 'false'));
+                window.location.href = '/login.html';
             } else {
                 // Capturar o erro do backend mais detalhadamente
                 const errorData = await response.json().catch(() => ({ message: 'Resposta não é JSON ou erro desconhecido.' }));

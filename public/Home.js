@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Manter o fetch do ViaCEP aqui, pois é funcionalidade do frontend
                 // A URL está correta. Se houver erro, é problema de rede/ambiente.
                 const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-                
+
                 // Verifica se a resposta HTTP do ViaCEP foi bem-sucedida (status 2xx)
                 if (!response.ok) {
                     throw new Error(`Erro HTTP! Status: ${response.status}`);
@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showError('trilhaAprendizagem', 'Selecione uma trilha de aprendizagem.');
             isValid = false;
         }
-        
+
         // Validação dos termos e condições
         if (!termsCheckbox.checked) {
             alert('Você deve concordar com os Termos e Condições e com a Política de Privacidade para fazer a inscrição.');
@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Se o formulário for válido, prosseguir com o envio
         console.log('Formulário válido. Enviando dados...');
-        
+
         // Criar FormData para enviar dados e arquivos
         const formToSend = new FormData();
         for (const key in rawData) {
@@ -264,21 +264,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // A URL DEVE SER APENAS '/register' ou 'http://localhost:3000/register'
-            // O '/1' no erro 500 que você viu indica que algo adicionou isso.
-            // Certifique-se que NENHUMA extensão do navegador está modificando suas requisições.
-            const response = await fetch('http://localhost:3000/register', { 
+            const response = await fetch('http://localhost:3000/register', {
                 method: 'POST',
                 body: formToSend, // FormData não precisa de 'Content-Type' customizado para 'multipart/form-data'
             });
 
             if (response.ok) {
-                const result = await response.json(); 
+                const result = await response.json();
                 console.log('Inscrição realizada com sucesso!', result);
                 alert('Inscrição realizada com sucesso!');
-                registrationForm.reset(); 
-                document.getElementById("selectedFile").textContent = ''; 
-                document.getElementById("comprovanteSelectedfile").textContent = ''; 
-                trilhaOptions.forEach(opt => opt.setAttribute('data-selected', 'false')); 
+                // **********************************************
+                // *** ADIÇÃO DA LINHA DE REDIRECIONAMENTO AQUI ***
+                // **********************************************
+                window.location.href = '/login.html'; // Redireciona para a página de login
+
+                registrationForm.reset();
+                document.getElementById("selectedFile").textContent = '';
+                document.getElementById("comprovanteSelectedfile").textContent = '';
+                trilhaOptions.forEach(opt => opt.setAttribute('data-selected', 'false'));
             } else {
                 // Capturar o erro do backend mais detalhadamente
                 const errorData = await response.json().catch(() => ({ message: 'Resposta não é JSON ou erro desconhecido.' }));

@@ -29,6 +29,14 @@
   --Font-Poppins: "Poppins", sans-serif;
 }
 
+/* Força a rolagem do documento principal */
+html, body {
+  height: auto;
+  min-height: 100%;
+  overflow-y: auto; /* Garante que a rolagem vertical seja permitida */
+  overflow-x: hidden; /* Evita a rolagem horizontal */
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -98,14 +106,14 @@ strong {
   display: flex;
   justify-content: left;
   align-items: left;
-  min-height: 100vh; /* Alterado de height para min-height */
+  /* Removido: min-height: 100vh; */
 }
 
 .FirstHalf {
   background: var(--Surface-Primary);
   padding: 64px 104px;
   width: 52%;
-  overflow-y: auto;
+  /* Removido: overflow-y: auto; */
   align-items: left;
 }
 
@@ -569,7 +577,7 @@ input[type="file"] {
   .HalfOne {
     flex-direction: column;
     height: auto;
-    min-height: auto; /* Adicionado para garantir rolagem em telas menores */
+    min-height: auto;
   }
 
   .FirstHalf,

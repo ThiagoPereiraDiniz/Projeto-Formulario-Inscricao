@@ -33,8 +33,8 @@
 html, body {
   height: auto;
   min-height: 100%;
-  overflow-y: auto; /* Garante que a rolagem vertical seja permitida */
-  overflow-x: hidden; /* Evita a rolagem horizontal */
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 * {
@@ -106,14 +106,12 @@ strong {
   display: flex;
   justify-content: left;
   align-items: left;
-  /* Removido: min-height: 100vh; */
 }
 
 .FirstHalf {
   background: var(--Surface-Primary);
   padding: 64px 104px;
   width: 52%;
-  /* Removido: overflow-y: auto; */
   align-items: left;
 }
 
@@ -400,8 +398,11 @@ input[type="file"] {
 
 .Logo {
   width: 300px;
+  max-width: 100%;
   height: auto;
-  padding: 10px 187.75px 10px 220px;
+  display: block;
+  padding: 10px; /* Ajustado para um valor mais seguro */
+  margin: 0 auto;
 }
 
 .terms-text {
@@ -536,7 +537,7 @@ input[type="file"] {
   font-family: var(--Font-Poppins);
   font-weight: 400;
   font-size: 1.5rem;
-  color: #57534E;
+  color: var(--Text-Secondary);
   display: flex;
   flex-direction: row;
   align-items: flex-start;

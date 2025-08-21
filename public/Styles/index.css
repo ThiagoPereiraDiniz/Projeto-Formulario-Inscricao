@@ -32,7 +32,7 @@
 * {
   margin: 0;
   padding: 0;
-  box-sizing: border-box; /* Adicionado para melhor controle de layout */
+  box-sizing: border-box;
 }
 
 ::-webkit-scrollbar {
@@ -98,7 +98,7 @@ strong {
   display: flex;
   justify-content: left;
   align-items: left;
-  height: 100vh;
+  min-height: 100vh; /* Alterado de height para min-height */
 }
 
 .FirstHalf {
@@ -569,6 +569,7 @@ input[type="file"] {
   .HalfOne {
     flex-direction: column;
     height: auto;
+    min-height: auto; /* Adicionado para garantir rolagem em telas menores */
   }
 
   .FirstHalf,

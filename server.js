@@ -73,7 +73,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Rota inicial - serve Home.html
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
 // ROTA DE REGISTRO DE USUÁRIO (POST /register)
